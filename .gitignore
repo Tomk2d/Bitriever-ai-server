@@ -1,0 +1,90 @@
+# Byte-compiled / optimized
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+*.egg
+MANIFEST
+
+# Virtual environments
+.env
+.venv
+env/
+venv/
+ENV/
+
+# IDE / Editor
+.idea/
+.vscode/
+.cursor/
+*.iml
+*.code-workspace
+
+# macOS
+.DS_Store
+.AppleDouble
+._*
+
+# Testing / coverage
+.tox/
+.nox/
+.coverage
+.coverage.*
+.htmlcov
+.pytest_cache/
+.hypothesis/
+
+# mypy / type checkers
+.mypy_cache/
+.dmypy.json
+.pyre/
+.pytype/
+
+# Logs and runtime
+*.log
+logs/
+*.pid
+pids/
+
+# Local data (large or sensitive)
+data/
+testData/
+
+# Coin images / binary assets
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.webp
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Temporary
+tmp/
+temp/
+*.tmp
+*.bak
+*.backup
+.cache/
+
+# OS
+Thumbs.db
+*.lnk
