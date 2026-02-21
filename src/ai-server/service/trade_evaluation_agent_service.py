@@ -34,6 +34,8 @@ from laboratory.fear_greed_ai import FearGreedExpertResponse
 from laboratory.trade_history_ai import run as run_trade_evaluation_agent
 from laboratory.trade_history_ai import TradeEvaluationExpertResponse
 
+from utils.openai_retry import with_openai_retry
+
 logger = logging.getLogger(__name__)
 
 
@@ -150,15 +152,18 @@ class TradeEvaluationAgentService:
             diary_trading_mind_text = _trading_mind_code_to_korean(diary.trading_mind)
             diary_reason_text = _extract_text_from_diary_content(diary.content) or "(작성 내용 없음)"
 
-        # 세 전문가 에이전트 병렬 호출
+        # 세 전문가 에이전트 병렬 호출 (429 시 재시도 적용)
+        run_article = with_openai_retry(self._article.run_article_expert)
+        run_coin_price = with_openai_retry(self._coin_price.run_coin_price)
+        run_fear_greed = with_openai_retry(self._fear_greed.run_fear_greed)
         with ThreadPoolExecutor(max_workers=3) as executor:
-            f_article = executor.submit(self._article.run_article_expert, target_date=target_date)
+            f_article = executor.submit(run_article, target_date=target_date)
             f_coin_price = executor.submit(
-                self._coin_price.run_coin_price,
+                run_coin_price,
                 target_date=target_date,
                 coin_id=coin_id,
             )
-            f_fear_greed = executor.submit(self._fear_greed.run_fear_greed, target_date=target_date)
+            f_fear_greed = executor.submit(run_fear_greed, target_date=target_date)
             wait([f_article, f_coin_price, f_fear_greed])
             article_resp = f_article.result()
             coin_price_resp = f_coin_price.result()
@@ -180,8 +185,9 @@ class TradeEvaluationAgentService:
             fear_greed_resp.short_long_term_perspective,
         )
 
-        # 메타 에이전트 호출 (3개 결과 종합)
-        trade_eval_resp = run_trade_evaluation_agent(
+        # 메타 에이전트 호출 (3개 결과 종합, 429 시 재시도 적용)
+        run_meta = with_openai_retry(run_trade_evaluation_agent)
+        trade_eval_resp = run_meta(
             target_period=target_period,
             expert_article_summary=expert_article_summary,
             expert_coin_price_summary=expert_coin_price_summary,
